@@ -1,0 +1,25 @@
+---
+title: "almond"
+author: "Anna Abelman"
+date: "4/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(here)
+```
+
+```{r}
+#read in the clim data
+clim <- read_csv(here("clim.csv"))
+```
+
+
+```{r}
+temperature <- clim %>% 
+  filter(month == "2")
+```
+
