@@ -15,11 +15,39 @@ library(here)
 ```{r}
 #read in the clim data
 clim <- read_csv(here("clim.csv"))
+
+source("almond_model.R")
 ```
 
 
 ```{r}
 temperature <- clim %>% 
-  filter(month == "2")
+  filter(month == "2") %>% 
+  group_by(year) %>% 
+  summarize(
+    avg = mean(tmin_c)
+  ) 
 ```
+
+
+```{r}
+rain <- clim %>% 
+  filter(month == "1") %>% 
+  group_by(year) %>% 
+  summarize(
+    sum = sum(precip)
+  )
+
+df <- data.frame(temperature, rain) %>% 
+  select(-year.1)
+```
+
+
+```{r}
+almond_model(clim)
+
+```
+
+
+
 
