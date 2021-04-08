@@ -1,8 +1,8 @@
 ---
-title: "almond"
-author: "Anna Abelman"
+title: "Almond Model"
+author: "Anna Abelman, Julia Dagum, Jaleise Hall"
 date: "4/8/2021"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -12,15 +12,21 @@ library(tidyverse)
 library(here)
 ```
 
+### Summary
+
+After developing an R function to represent the California almond yield anomaly regression model from [*Lobell 2006*](https://gauchospace.ucsb.edu/courses/mod/resource/view.php?id=6782707), the yield anomalies for all years 1989 - 2010 were calculated. We found that the year in which there was the most extreme anomaly was in 1995 where the yield anomaly was nearly 2000 ton acre^-1^. There were other much smaller spikes in 1997, 2005, and 2008. With the full production of almond crop being 6 years, we may see such a high spike in 1995 due to the crop reaching it's full maturity. This reasoning requires the assumption the the almond crops studies in *Lobell 2006* were planted at the start of the study period.
+
+
 ```{r}
 #read in the clim data
-clim <- read_csv(here("clim.csv"))
+clim <- read.table("clim.txt", sep=" ", header=T)
 
 source("almond_model.R")
 ```
 
 
 ```{r}
+#create temperature subset for February
 temperature <- clim %>% 
   filter(month == "2") %>% 
   group_by(year) %>% 
@@ -31,6 +37,7 @@ temperature <- clim %>%
 
 
 ```{r}
+#create precipitation subset for January
 rain <- clim %>% 
   filter(month == "1") %>% 
   group_by(year) %>% 
@@ -38,16 +45,35 @@ rain <- clim %>%
     sum = sum(precip)
   )
 
+#combine the temperature and precipitation data
 df <- data.frame(temperature, rain) %>% 
   select(-year.1)
 ```
 
 
 ```{r}
+#test the model on the clim data
 almond_model(clim)
-
 ```
 
-
+```{r, fig.cap= "Almond yield anomaly in California for all years 1989 to 2010. The anomaly is calculated using the regression model: Y = -0.015T~n,2~ - 0.0046T^2^~n,2~ - 0.07P~1~ + 0.0043P^2^~1~ + 0.28" }
+#turn the model output into a data frame
+almond_yield_anomaly <- data.frame(year = rain$year, anomaly = almond_model(clim)) %>% 
+  mutate(year = lubridate::ymd(year, truncated = 2L))
+  
+#plot the anomalies
+ggplot(data = almond_yield_anomaly, aes(y = anomaly, x = year)) +
+  geom_line() +
+  scale_x_date(date_breaks = "1 year",
+               date_labels = "%Y",
+               limits = as.Date(c("1989-01-01","2010-01-01"))) +
+  labs(x = "Year",
+       y = expression("Anomaly (ton" ~acre^-1~ ")"),
+       title = "Annual Almond Yield Anomaly (1989 - 2010)") +
+  theme_minimal() +
+  theme(panel.grid.minor.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1))
+```
 
 
