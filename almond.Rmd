@@ -14,7 +14,7 @@ library(here)
 
 ### Summary
 
-After developing an R function to represent the California almond yield anomaly regression model from [*Lobell 2006*](https://gauchospace.ucsb.edu/courses/mod/resource/view.php?id=6782707), the yield anomalies for all years 1989 - 2010 were calculated. We found that the year in which there was the most extreme anomaly was in 1995 where the yield anomaly was nearly 2000 ton acre^-1^. There were other much smaller spikes in 1997, 2005, and 2008. With the full production of almond crop being 6 years, we may see such a high spike in 1995 due to the crop reaching it's full maturity. This reasoning requires the assumption the the almond crops studies in *Lobell 2006* were planted at the start of the study period.
+After developing an R function to represent the California almond yield anomaly regression model from [*Lobell 2006*](https://gauchospace.ucsb.edu/courses/mod/resource/view.php?id=6782707), the yield anomalies for all years 1989 - 2010 were calculated. We found that the year in which there was the most extreme anomaly was in 1995 where the yield anomaly was nearly 2000 ton acre^-1^. There were other much smaller spikes in 1997, 2005, and 2008. With the full production of almond crop being 6 years, we may see such a high spike in 1995 due to the crop reaching it's full maturity. This reasoning requires the assumption that the almond crops studies in *Lobell 2006* were planted at the start of the study period.
 
 
 ```{r}
