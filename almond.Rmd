@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(here)
@@ -21,44 +21,43 @@ After developing an R function to represent the California almond yield anomaly 
 #read in the clim data
 clim <- read.table("clim.txt", sep=" ", header=T)
 
+#read in almond model from function script
 source("almond_model.R")
 ```
 
-
+**Testing to see if the function works**
 ```{r}
 #create temperature subset for February
-temperature <- clim %>% 
-  filter(month == "2") %>% 
-  group_by(year) %>% 
+temperature <- clim %>%
+  filter(month == "2") %>%
+  group_by(year) %>%
   summarize(
     avg = mean(tmin_c)
-  ) 
-```
+  )
 
-
-```{r}
 #create precipitation subset for January
-rain <- clim %>% 
-  filter(month == "1") %>% 
-  group_by(year) %>% 
+rain <- clim %>%
+  filter(month == "1") %>%
+  group_by(year) %>%
   summarize(
     sum = sum(precip)
   )
 
-#combine the temperature and precipitation data
-df <- data.frame(temperature, rain) %>% 
+# #combine the temperature and precipitation data
+df <- data.frame(temperature, rain) %>%
   select(-year.1)
 ```
 
-
+### Calculate the Almond Anomaly model
 ```{r}
 #test the model on the clim data
 almond_model(clim)
 ```
 
 ```{r, fig.cap= "Almond yield anomaly in California for all years 1989 to 2010. The anomaly is calculated using the regression model: Y = -0.015T~n,2~ - 0.0046T^2^~n,2~ - 0.07P~1~ + 0.0043P^2^~1~ + 0.28" }
+
 #turn the model output into a data frame
-almond_yield_anomaly <- data.frame(year = rain$year, anomaly = almond_model(clim)) %>% 
+almond_yield_anomaly <- data.frame(year = df$year, anomaly = almond_model(clim)) %>% 
   mutate(year = lubridate::ymd(year, truncated = 2L))
   
 #plot the anomalies
