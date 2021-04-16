@@ -11,9 +11,7 @@
 #' @example almond_model(clim)
 #' @return California almond yield anomaly (ton acre^-1)
 
-
 almond_model <- function(clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3 = 0.07, clim_var4 = 0.0043, intercept = 0.28){
-  
   # find the average minimum temperature per year in February
   temperature <- clim %>% 
     filter(month == "2") %>% #filter to only have February 
@@ -37,5 +35,7 @@ almond_model <- function(clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3
   #calculate final yield anomaly using regression function
   final_model <- clim_var1*(df$avg) - clim_var2*((df$avg)^2) - clim_var3*(df$sum) + clim_var4*((df$sum)^2) + intercept
 
-  return(final_model)
+  #return(final_model)
+  return(list(c(final_model,df)))
+  
 }

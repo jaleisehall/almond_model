@@ -51,7 +51,7 @@ df <- data.frame(temperature, rain) %>%
 ### Calculate the Almond Anomaly model
 ```{r}
 #test the model on the clim data
-almond_model(clim)
+almond_output <- almond_model(clim)
 ```
 
 ```{r, fig.cap= "Almond yield anomaly in California for all years 1989 to 2010. The anomaly is calculated using the regression model: Y = -0.015T~n,2~ - 0.0046T^2^~n,2~ - 0.07P~1~ + 0.0043P^2^~1~ + 0.28" }
@@ -74,5 +74,26 @@ ggplot(data = almond_yield_anomaly, aes(y = anomaly, x = year)) +
         plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1))
 ```
+Assignment 3
+```{r}
+# sensitivity analysis for clim_var4
+clim_var4 <- rnorm(n = 500, mean = 0.0043, sd = 0.001)
+#almond_sens <- map(almond_model, clim_var4, clim=clim)
+almond_sens = clim_var4 %>% map(~almond_model(clim = clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3 = 0.07, clim_var4 = .x, intercept = 0.28))
 
+
+#res = clim_var4 %>% map(~almond_model(clim = clim, clim_var4 =.x))
+
+# we can use map to extract named items from a list to a double (numeric)
+map_dbl(res,"final_model")
+resdf = map_dfr(res,`[`, c(1:500))
+#resdf = map_dfr(res,`[`, c("mean","min","max"))
+#res = map(clim_var4, almond_model, clim = clim) 
+
+
+#turn the model output into a data frame
+#almond_yield_anomaly <- data.frame(year = df$year, anomaly = almond_model(clim)) %>% 
+#  mutate(year = lubridate::ymd(year, truncated = 2L))
+
+```
 
