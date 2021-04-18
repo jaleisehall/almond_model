@@ -52,6 +52,7 @@ df <- data.frame(temperature, rain) %>%
 ```{r}
 #test the model on the clim data
 almond_output <- almond_model(clim)
+almond_output
 ```
 
 ```{r, fig.cap= "Almond yield anomaly in California for all years 1989 to 2010. The anomaly is calculated using the regression model: Y = -0.015T~n,2~ - 0.0046T^2^~n,2~ - 0.07P~1~ + 0.0043P^2^~1~ + 0.28" }
@@ -77,9 +78,16 @@ ggplot(data = almond_yield_anomaly, aes(y = anomaly, x = year)) +
 Assignment 3
 ```{r}
 # sensitivity analysis for clim_var4
+# create normal distribution 
 clim_var4 <- rnorm(n = 500, mean = 0.0043, sd = 0.001)
+
+#res = clim_var4 %>% map_dfc(~almond_model(height=reservoir_model_res$height, flow=reservoir_model_res$flow, Keff=.))
 #almond_sens <- map(almond_model, clim_var4, clim=clim)
-almond_sens = clim_var4 %>% map(~almond_model(clim = clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3 = 0.07, clim_var4 = .x, intercept = 0.28))
+
+# use map_dfc to run for each value of clim_var4
+
+almond_sens = clim_var4 %>% map_dfc(~almond_model(clim = clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3 = 0.07, clim_var4 = .x, intercept = 0.28))
+colnames(almond_sens)=clim_var4
 
 
 #res = clim_var4 %>% map(~almond_model(clim = clim, clim_var4 =.x))

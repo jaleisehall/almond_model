@@ -35,7 +35,7 @@ almond_model <- function(clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3
   #calculate final yield anomaly using regression function
   final_model <- clim_var1*(df$avg) - clim_var2*((df$avg)^2) - clim_var3*(df$sum) + clim_var4*((df$sum)^2) + intercept
 
-  #return(final_model)
-  return(list(c(final_model,df)))
+  return(final_model)
+ # return(list(c(final_model,df)))
   
 }
