@@ -114,3 +114,14 @@ ggplot(almond_sens_transpose, aes(x = year, y = anomaly, fill = year)) +
 
 ```
 
+```{r}
+source("comput_NPV.R")
+
+#npv <- compute_NPV()
+
+```
+
+
+
+
+
