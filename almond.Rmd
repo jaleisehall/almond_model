@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(here)
+library(janitor)
 ```
 
 ### Summary
@@ -43,7 +44,7 @@ rain <- clim %>%
     sum = sum(precip)
   )
 
-# #combine the temperature and precipitation data
+#combine the temperature and precipitation data
 df <- data.frame(temperature, rain) %>%
   select(-year.1)
 ```
@@ -75,48 +76,41 @@ ggplot(data = almond_yield_anomaly, aes(y = anomaly, x = year)) +
         plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1))
 ```
-Assignment 3
-```{r}
-# sensitivity analysis for clim_var4
-# create normal distribution 
+
+# Assignment 3: Sensitivity Analysis & NPV
+
+### Sensitivity Analysis
+
+```{r, fig.cap= "Almond yield anomaly sensitivity box plot for all years 1989 to 2010. The almond yield anomaly is calculated 500 times pulling a precipitation squared variable from a random normal distribution with a mean of 0.0043 and a standard deviation of 0.001."}
+
+#create normal distribution 
 clim_var4 <- rnorm(n = 500, mean = 0.0043, sd = 0.001)
 
-#res = clim_var4 %>% map_dfc(~almond_model(height=reservoir_model_res$height, flow=reservoir_model_res$flow, Keff=.))
-#almond_sens <- map(almond_model, clim_var4, clim=clim)
+#use map_dfc to run for each value of clim_var4
+almond_sens <-clim_var4 %>% 
+  map_dfc(~almond_model(clim = clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3 = 0.07, clim_var4 = .x, intercept = 0.28))
 
-# use map_dfc to run for each value of clim_var4
-almond_sens = clim_var4 %>% map_dfc(~almond_model(clim = clim, clim_var1 = -0.015, clim_var2 = 0.0046, clim_var3 = 0.07, clim_var4 = .x, intercept = 0.28))
+#create vectors to change the column names of the transposed data frame
+oldyears <- c("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18", "v19", "v20", "v21", "v22")
 
-# create a vector with years
-# year = seq(from=1989, to=2010)
-# year_num = as.double(year)
+newyears <- as.character(pull(df, year))
 
-# add another column for each year
-# almond_sens$year = year_num
+#transpose so columns are years and rows are the anomaly; use pivot longer to get one column for the anomaly and one column for the corresponding year
+almond_sens_transpose <- as.data.frame(t(almond_sens)) %>%
+  clean_names() %>% 
+  rename_at(vars(oldyears), ~ newyears) %>% 
+  pivot_longer(everything(), names_to = "year", values_to = "anomaly")
 
-# transpose so that columns are years and rows are clim_var4
-almond_sens_transpose <- t(almond_sens)
-
-# rename columns
-#colnames(almond_sens_transpose) = almond_sens_transpose$year
-
-# rearrange to plot
-almond_sens_plot=as.data.frame(almond_sens_transpose) %>% pivot_longer(everything(),names_to="clim_var4", values_to="anomoly")
-ggplot(almond_sens_plot, aes(clim_var4, anomoly, fill=clim_var4))+geom_boxplot() 
-#+ labs(y="Power (W/s)", "Efficiency")
-
-#res = clim_var4 %>% map(~almond_model(clim = clim, clim_var4 =.x))
-
-# we can use map to extract named items from a list to a double (numeric)
-#map_dbl(res,"final_model")
-#resdf = map_dfr(res,`[`, c(1:500))
-#resdf = map_dfr(res,`[`, c("mean","min","max"))
-#res = map(clim_var4, almond_model, clim = clim) 
-
-
-#turn the model output into a data frame
-#almond_yield_anomaly <- data.frame(year = df$year, anomaly = almond_model(clim)) %>% 
-#  mutate(year = lubridate::ymd(year, truncated = 2L))
+#plot as a boxplot
+ggplot(almond_sens_transpose, aes(x = year, y = anomaly, fill = year)) +
+  geom_boxplot() +
+  labs(x = "Year",
+       y = expression("Anomaly (ton" ~acre^-1~ ")"),
+       title = "Almond Yield Anomaly Sensitivity (1989 - 2010)") +
+  theme_minimal() +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1))
 
 ```
 
