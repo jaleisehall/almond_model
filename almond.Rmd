@@ -99,7 +99,9 @@ newyears <- as.character(pull(df, year))
 almond_sens_transpose <- as.data.frame(t(almond_sens)) %>%
   clean_names() %>% 
   rename_at(vars(oldyears), ~ newyears) %>% 
-  pivot_longer(everything(), names_to = "year", values_to = "anomaly")
+  pivot_longer(everything(), names_to = "year", values_to = "anomaly") %>% 
+  mutate(value = ((anomaly)*2000*2.5)-3800) %>% 
+  mutate(time = (as.numeric(year) - 1989))
 
 #plot as a boxplot
 ggplot(almond_sens_transpose, aes(x = year, y = anomaly, fill = year)) +
@@ -114,10 +116,28 @@ ggplot(almond_sens_transpose, aes(x = year, y = anomaly, fill = year)) +
 
 ```
 
-```{r}
+Almond production costs $3800/acre
+
+Almond profit is $2.50/lb
+
+Almond production on average is 1 ton/acre/yr
+```{r, fig.cap= ""}
 source("comput_NPV.R")
 
-#npv <- compute_NPV()
+npv <- compute_NPV(value = almond_sens_transpose$value, time = almond_sens_transpose$time)
+
+almond_npv <- almond_sens_transpose %>% 
+  mutate(npv = npv)
+
+ggplot(almond_npv, aes(x = year, y = npv, fill = year)) +
+  geom_boxplot() +
+  labs(x = "Year",
+       y = "Net Present Value ($/acre)",
+       title = "Almond Yield Anomaly NPV (1989 - 2010)") +
+  theme_minimal() +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1))
 
 ```
 
