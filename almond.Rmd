@@ -116,13 +116,11 @@ ggplot(almond_sens_transpose, aes(x = year, y = anomaly, fill = year)) +
 
 ```
 
-Almond production costs $3800/acre
 
-Almond profit is $2.50/lb
+### Net Present Value (NPV)
 
-Almond production on average is 1 ton/acre/yr
-```{r, fig.cap= ""}
-source("comput_NPV.R")
+```{r, fig.cap= "Almond yield anomaly net present value (NPV) box plot for all years 1989 to 2010. The almond yield anomaly NPV uses a discount rate of 0.12 and is calculated with 1989 as the reference year."}
+source("compute_NPV.R")
 
 npv <- compute_NPV(value = almond_sens_transpose$value, time = almond_sens_transpose$time)
 
