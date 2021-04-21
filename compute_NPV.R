@@ -1,6 +1,6 @@
 #' compute_NPV
 #' 
-#' compute net present value
+#' This function is calculating the net present value provided in class.
 #' @param value/cost ($)
 #' @param time in the future that cost/value occurs (years)
 #' @param discount rate 
